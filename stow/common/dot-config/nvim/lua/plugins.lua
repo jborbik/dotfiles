@@ -47,14 +47,6 @@ local plugins = {
     end
   },
   {
-    'tpope/vim-commentary', -- gcc to comment
-    event = 'VeryLazy',
-    init = function ()
-      -- Comment c, cpp, cs, java with //
-      vim.api.nvim_command([[autocmd FileType c,cpp,cs,java setlocal commentstring=//\ %s]])
-    end
-  },
-  {
     "kylechui/nvim-surround",
     version = "*", -- Use for stability; omit to use `main` branch for the latest features
     config = function()
