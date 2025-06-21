@@ -943,6 +943,7 @@ local plugins = {
           local cwd = vim.fn.getcwd()
           if vim.fn.argc() == 0 and not vim.g.started_with_stdin and not disabled_dirs[cwd] then
             require("persistence").load()
+            vim.schedule(function() vim.api.nvim_exec_autocmds("BufNewFile", {}) end)
           else
             require("persistence").stop()
           end
