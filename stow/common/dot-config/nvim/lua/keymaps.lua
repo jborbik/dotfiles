@@ -223,3 +223,7 @@ else
   map({'n', 'x'}, 'go', ":call VSCodeNotify('editor.action.goToTypeDefinition')<CR>")
   map({'n', 'x'}, 'gl', ":call VSCodeNotify('editor.action.showHover')<CR>")
 end
+
+-- remove the default mapping set in https://github.com/neovim/neovim/blob/master/runtime/lua/vim/_defaults.lua
+-- I use it for substitute
+vim.keymap.del('n', 'gri', {})
