@@ -1607,7 +1607,7 @@ local plugins = {
       notifier = { enabled = false },
       quickfile = { enabled = true },
       scroll = { enabled = false },
-      statuscolumn = { enabled = false },
+      statuscolumn = { enabled = not vscode },
       words = { enabled = true },
     },
     config = function(_, opts)
