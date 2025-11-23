@@ -1355,10 +1355,8 @@ local plugins = {
     keys = {
       { "<leader>oo", "<cmd>OverseerToggle!<CR>", mode = "n", desc = "[O]verseer [O]pen" },
       { "<leader>or", "<cmd>OverseerRun<CR>", mode = "n", desc = "[O]verseer [R]un" },
-      { "<leader>oc", "<cmd>OverseerRunCmd<CR>", mode = "n", desc = "[O]verseer run [C]ommand" },
-      { "<leader>ol", "<cmd>OverseerLoadBundle<CR>", mode = "n", desc = "[O]verseer [L]oad" },
-      { "<leader>od", "<cmd>OverseerQuickAction<CR>", mode = "n", desc = "[O]verseer [D]o quick action" },
-      { "<leader>os", "<cmd>OverseerTaskAction<CR>", mode = "n", desc = "[O]verseer [S]elect task action" },
+      { "<leader>os", "<cmd>OverseerShell<CR>", mode = "n", desc = "[O]verseer [S]hell" },
+      { "<leader>ot", "<cmd>OverseerTaskAction<CR>", mode = "n", desc = "[O]verseer [T]ask action" },
     },
     opts = {
       templates = { "builtin", "user.run_script", "user.run_script_with_args", "user.populate_scripts" },
