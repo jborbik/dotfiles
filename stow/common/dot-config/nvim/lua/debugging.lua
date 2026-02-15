@@ -203,9 +203,7 @@ return {
         lldb = { 'rust', 'c', 'cpp' },
       }
       vim.schedule(function()
-        require("dap.ext.vscode").json_decode = require("overseer.json").decode
-        require("dap.ext.vscode").load_launchjs(nil, { node = { "typescript", "javascript" } })
-        require("overseer").patch_dap(true)
+        require("overseer").enable_dap(true)
       end)
     end,
     cond = not_vscode
