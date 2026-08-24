@@ -1,0 +1,121 @@
+# Starship configuration matching Powerlevel10k Lean style
+
+add_newline = false
+command_timeout = 1000
+
+# Line 1: Directory + Git
+# Line 2: Prompt character
+format = """
+$directory\
+$git_branch\
+$git_commit\
+$git_state\
+$git_status\
+$fill\
+$cmd_duration\
+$status\
+$username\
+$hostname\
+$time\
+$line_break\
+$character"""
+
+[fill]
+symbol = " "
+
+[username]
+style_user = "fg:208"
+style_root = "bold red"
+format = "[$user]($style)@"
+disabled = false
+show_always = false # Only shows when in SSH (or set to true to always show)
+
+[hostname]
+ssh_only = true     # Only shows when in SSH (or set to false to always show)
+format = "[$hostname]($style) "
+style = "fg:208"
+
+[time]
+disabled = false
+time_format = "%T" # 24-hour format (e.g. 14:30:15) or "%I:%M:%S %p" for 12-hour
+format = "[$time]($style)"
+style = "dimmed white"
+
+[directory]
+style = "blue"
+truncation_length = 6
+truncate_to_repo = false
+truncation_symbol = "…/"
+read_only = " 🔒"
+
+[git_branch]
+style = "green"
+symbol = " "
+format = "[$symbol$branch]($style) "
+only_attached = true
+
+[git_commit]
+disabled = false
+commit_hash_length = 7
+style = "yellow"
+only_detached = true
+tag_disabled = false
+tag_symbol = " 🏷 "
+format = "[($hash$tag)]($style) "
+
+[git_state]
+style = "bold yellow"
+format = "[($state $progress_current/$progress_total)]($style) "
+
+[git_status]
+style = "green"
+format = "([$ahead_behind]($style) )([$all_status](yellow))"
+ahead = "⇡${count}"
+behind = "⇣${count}"
+diverged = "⇡${ahead_count} ⇣${behind_count}"
+conflicted = "=${count} "
+untracked = "?${count} "
+modified = "!${count} "
+staged = "+${count} "
+renamed = "»${count} "
+deleted = "✘${count} "
+stashed = "*${count} "
+
+[character]
+success_symbol = "[❯](bold green)"
+error_symbol = "[❯](bold red)"
+vicmd_symbol = "[❮](bold yellow)"
+
+[cmd_duration]
+min_time = 2_000
+format = "took [$duration]($style) "
+style = "yellow"
+
+[status]
+disabled = false
+style = "bold red"
+symbol = "✘ "
+format = "[$symbol$status]($style) "
+recognize_signal_code = true
+pipestatus = true
+pipestatus_format = "[$pipestatus]($style) => "
+pipestatus_separator = "|"
+
+# Disable noisy default modules for a clean, lean prompt
+[aws]
+disabled = true
+
+[gcloud]
+disabled = true
+
+[nodejs]
+disabled = true
+
+[python]
+disabled = false
+
+[package]
+disabled = true
+
+[docker_context]
+disabled = false

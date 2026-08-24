@@ -49,6 +49,15 @@ EOF
   fi
 }
 
+function install_starship() {
+  curl -sS https://starship.rs/install.sh | sh
+    cat << 'EOF' >> ~/.zshrc
+
+eval "$(starship init zsh)"
+[[ ! -f ~/.config/starship-transient.zsh ]] || source ~/.config/starship-transient.zsh
+EOF
+}
+
 function install_sublimetext() {
   if ! [ -x "$(command -v subl)" ]; then
     wget -qO - https://download.sublimetext.com/sublimehq-pub.gpg | gpg --dearmor | sudo tee /etc/apt/trusted.gpg.d/sublimehq-archive.gpg >/dev/null
@@ -165,10 +174,10 @@ function install_wezterm() {
 }
 
 setup_nerdfont
-install_powerlevel10k
 install_sublimetext
 install_ghostty
 install_open_any_terminal
+install_starship
 sudo apt install copyq -y
 
 if [ "$distro_name" = "Ubuntu" ]; then
