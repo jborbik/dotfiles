@@ -68,17 +68,9 @@ add "$ROOT_DIR/stow/common/dot-config/nvim/snippets" "${vscode_snippets_path}"
 
 cd "$ROOT_DIR"
 
-if ! [ -x "$(command -v stow)" ]; then
+if ! command -v stow >/dev/null 2>&1; then
   if [[ "$OSTYPE" == "linux-gnu"* ]]; then
-    stow_version=$(stow --version | awk 'NR==1{print $NF}')
-    min_stow_version="2.4.0"
-
-    # Compare versions
-    if [ "$(printf '%s\n' "$stow_version" "$min_stow_version" | sort -V | head -n1)" = "$stow_version" ] && [ "$stow_version" != "$min_stow_version" ]; then
-      echo "Your stow version ($stow_version) is lower than $min_stow_version."
-      echo "Installing from tarfile"
-      install_stow_debian
-    fi
+    install_stow_debian
   elif [[ "$OSTYPE" == "darwin"* ]]; then
     if ! [ -x "$(command -v brew)" ]; then
       /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
@@ -87,6 +79,16 @@ if ! [ -x "$(command -v stow)" ]; then
   else
     echo "Unsupported OS"
     exit 1
+  fi
+elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
+  stow_version=$(stow --version | awk 'NR==1{print $NF}')
+  min_stow_version="2.4.0"
+
+  # Compare versions
+  if [ "$(printf '%s\n' "$stow_version" "$min_stow_version" | sort -V | head -n1)" = "$stow_version" ] && [ "$stow_version" != "$min_stow_version" ]; then
+    echo "Your stow version ($stow_version) is lower than $min_stow_version."
+    echo "Installing from tarfile"
+    install_stow_debian
   fi
 fi
 

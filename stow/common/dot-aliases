@@ -1,7 +1,10 @@
-alias icloud="cd '$HOME/Library/Mobile Documents/com~apple~CloudDocs/'"
-alias clean_pycache="find . | grep -E '(__pycache__|\.pyc|\.pyo$)' | xargs rm -rf"
+if [[ "$OSTYPE" == "darwin"* ]]; then
+  alias icloud="cd '$HOME/Library/Mobile Documents/com~apple~CloudDocs/'"
+  alias samsung="cd '/Volumes/Samsung_980/'"
+fi
+
+alias clean_pycache='find . -type d -name "__pycache__" -exec rm -rf {} + -o -name "*.py[co]" -delete'
 alias venv="if [ -e ./venv/bin/activate ]; then source ./venv/bin/activate; else python3 -m venv venv && source ./venv/bin/activate; fi"
-alias samsung="cd '/Volumes/Samsung_980/'"
 if command -v nvim &> /dev/null; then
   alias vim=nvim
   export EDITOR=nvim
