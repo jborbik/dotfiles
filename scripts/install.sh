@@ -64,7 +64,7 @@ else
   exit 1
 fi
 mkdir -p "$(dirname "${vscode_snippets_path}")"
-add "$SCRIPT_DIR/nvim/snippets" "${vscode_snippets_path}"
+add "$ROOT_DIR/stow/common/dot-config/nvim/snippets" "${vscode_snippets_path}"
 
 cd "$ROOT_DIR"
 
