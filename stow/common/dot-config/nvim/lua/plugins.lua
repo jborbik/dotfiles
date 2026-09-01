@@ -448,7 +448,7 @@ local plugins = {
   {
     'nvim-telescope/telescope.nvim',
     cmd = 'Telescope',
-    branch = '0.1.x',
+    version = '*',
     keys = {
       -- bookmarks
       {'<leader>sB', "<cmd>lua require('telescope').extensions.vim_bookmarks.all()<cr>", 'n', desc = "Show [b]ookmarks in workspace"},
@@ -1566,18 +1566,18 @@ local plugins = {
     },
     cond = not_vscode
   },
-  {
-    '3rd/image.nvim',
-    ft = { "markdown", "norg", "oil" },
-    dependencies = {
-      'leafo/magick',
-    },
-    opts = {
-      editor_only_render_when_focused = true,
-      tmux_show_only_in_active_window = true,
-    },
-    cond = not_vscode
-  },
+  -- {
+  --   '3rd/image.nvim',
+  --   ft = { "markdown", "norg", "oil" },
+  --   dependencies = {
+  --     'leafo/magick',
+  --   },
+  --   opts = {
+  --     editor_only_render_when_focused = true,
+  --     tmux_show_only_in_active_window = true,
+  --   },
+  --   cond = not_vscode
+  -- },
   {
     'numToStr/Navigator.nvim',
     keys = {

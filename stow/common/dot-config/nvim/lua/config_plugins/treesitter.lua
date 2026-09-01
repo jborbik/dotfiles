@@ -6,7 +6,7 @@ local parsers_to_install = { "bash", "cmake", "cpp", "css", "dockerfile", "go",
 if vim.fn.executable('tree-sitter') == 1 then
   parsers_to_install[#parsers_to_install+1] = "latex"
 end
-require('nvim-treesitter.configs').setup({
+require('nvim-treesitter').setup({
   ensure_installed = parsers_to_install,
   textobjects = {
     select = {
@@ -87,9 +87,4 @@ require('nvim-treesitter.configs').setup({
   },
 })
 
--- Repeat movement with ; and ,
--- vim way: ; goes to the direction you were moving.
-local ts_repeat_move = require "nvim-treesitter.textobjects.repeatable_move"
-vim.keymap.set({ "n", "x", "o" }, ";", ts_repeat_move.repeat_last_move, {silent = true})
-vim.keymap.set({ "n", "x", "o" }, ",", ts_repeat_move.repeat_last_move_opposite, {silent = true})
 vim.keymap.set("n", "<leader>th", "<cmd>TSToggle highlight<cr>", {desc="[t]oggle treesitter [h]ighlight"})

@@ -77,7 +77,7 @@ local lsp_attach = function(client, bufnr)
   -- Create a command `:Format` local to the LSP buffer
   if vim.fn.has("nvim-0.9.0") == 1 then
     if (client.server_capabilities.semanticTokensProvider and client.server_capabilities.semanticTokensProvider ~= 0) then
-      vim.cmd('TSBufDisable highlight')
+      if vim.treesitter.highlighter.active[vim.api.nvim_get_current_buf()] then vim.treesitter.highlighter.active[vim.api.nvim_get_current_buf()]:destroy() end
     end
   end
 end
@@ -234,7 +234,7 @@ require('mason-lspconfig').setup({
     gopls = function()
       require'lspconfig'.gopls.setup{
         on_attach = function(_, _)
-          vim.cmd('TSBufEnable highlight')
+          vim.treesitter.start()
         end
       }
     end,
