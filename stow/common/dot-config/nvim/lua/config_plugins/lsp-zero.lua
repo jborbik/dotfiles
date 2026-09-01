@@ -74,11 +74,9 @@ local lsp_attach = function(client, bufnr)
   nmap('[e', '<cmd>lua vim.diagnostic.goto_prev({ severity = vim.diagnostic.severity.ERROR })<CR>')
   nmap(']e', '<cmd>lua vim.diagnostic.goto_next({ severity = vim.diagnostic.severity.ERROR })<CR>')
 
-  -- Create a command `:Format` local to the LSP buffer
-  if vim.fn.has("nvim-0.9.0") == 1 then
-    if (client.server_capabilities.semanticTokensProvider and client.server_capabilities.semanticTokensProvider ~= 0) then
-      if vim.treesitter.highlighter.active[vim.api.nvim_get_current_buf()] then vim.treesitter.highlighter.active[vim.api.nvim_get_current_buf()]:destroy() end
-    end
+  -- Disable treesitter highlighting in favor of LSP semantic tokens if supported
+  if client.server_capabilities.semanticTokensProvider then
+    vim.treesitter.stop(bufnr)
   end
 end
 
@@ -191,12 +189,11 @@ require('mason-lspconfig').setup({
         return true
       end
 
-      local default_publish_diagnostics = vim.lsp.handlers["textDocument/publishDiagnostics"]
       local function custom_on_publish_diagnostics(err, result, ctx, config)
-        if result and result.diagnostics then
+        if not err and result and result.diagnostics then
           filter(result.diagnostics, pyright_accessed_filter)
         end
-        default_publish_diagnostics(err, result, ctx, config)
+        vim.lsp.diagnostic.on_publish_diagnostics(err, result, ctx, config)
       end
 
       require('lspconfig').pyright.setup({
@@ -234,11 +231,7 @@ require('mason-lspconfig').setup({
       })
     end,
     gopls = function()
-      require'lspconfig'.gopls.setup{
-        on_attach = function(_, _)
-          vim.treesitter.start()
-        end
-      }
+      require('lspconfig').gopls.setup({})
     end,
   },
 })

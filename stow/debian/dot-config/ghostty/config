@@ -2,7 +2,6 @@ clipboard-read = allow
 
 # Appearance
 theme = Dracula
-font-family = Monaco
 font-family = SFMono Nerd Font
 background-opacity = 0.99
 cursor-style = block
@@ -17,9 +16,6 @@ config-file = ?platform_config
 # Disable ligatures
 font-feature = -liga
 font-feature = -dlig
-
-# Keys
-macos-option-as-alt = left
 
 # some programs do not recognize TERM=xterm-ghostty, so use the classic one
 term = xterm-256color

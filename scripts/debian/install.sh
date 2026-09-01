@@ -27,11 +27,13 @@ function setup_nerdfont() {
 
 function install_starship() {
   curl -sS https://starship.rs/install.sh | sh -s -- -y
+  if ! grep -q "starship init zsh" "$HOME/.zshrc" 2>/dev/null; then
     cat << 'EOF' >> ~/.zshrc
 
 eval "$(starship init zsh)"
-[[ ! -f ~/.config/starship-transient.zsh ]] || source ~/.config/starship-transient.zsh
+[[ -f ~/.config/starship-transient.zsh ]] && source ~/.config/starship-transient.zsh
 EOF
+  fi
 }
 
 function install_sublimetext() {

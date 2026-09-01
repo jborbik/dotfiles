@@ -87,4 +87,13 @@ require('nvim-treesitter').setup({
   },
 })
 
-vim.keymap.set("n", "<leader>th", "<cmd>TSToggle highlight<cr>", {desc="[t]oggle treesitter [h]ighlight"})
+vim.keymap.set("n", "<leader>th", function()
+  local buf = vim.api.nvim_get_current_buf()
+  if vim.treesitter.highlighter.active[buf] then
+    vim.treesitter.stop(buf)
+    vim.notify("Treesitter highlight disabled", vim.log.levels.INFO)
+  else
+    vim.treesitter.start(buf)
+    vim.notify("Treesitter highlight enabled", vim.log.levels.INFO)
+  end
+end, { desc = "[t]oggle treesitter [h]ighlight" })
