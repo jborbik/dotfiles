@@ -506,7 +506,6 @@ local plugins = {
     end,
     cond = not_vscode
   },
-  {'farmergreg/vim-lastplace', cond = not_vscode},
   {
     'karb94/neoscroll.nvim',
     opts = {

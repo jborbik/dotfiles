@@ -191,9 +191,12 @@ require('mason-lspconfig').setup({
         return true
       end
 
-      local function custom_on_publish_diagnostics(a, params, client_id, c, config)
-        filter(params.diagnostics, pyright_accessed_filter)
-        vim.lsp.diagnostic.on_publish_diagnostics(a, params, client_id, c, config)
+      local default_publish_diagnostics = vim.lsp.handlers["textDocument/publishDiagnostics"]
+      local function custom_on_publish_diagnostics(err, result, ctx, config)
+        if result and result.diagnostics then
+          filter(result.diagnostics, pyright_accessed_filter)
+        end
+        default_publish_diagnostics(err, result, ctx, config)
       end
 
       require('lspconfig').pyright.setup({
@@ -203,10 +206,9 @@ require('mason-lspconfig').setup({
           vim.g.python_host_prog = python_path
           vim.g.python3_host_prog = python_path
         end,
-        on_attach = function(_, _)
-          vim.lsp.handlers["textDocument/publishDiagnostics"] = vim.lsp.with(
-            custom_on_publish_diagnostics, {})
-        end,
+        handlers = {
+          ["textDocument/publishDiagnostics"] = custom_on_publish_diagnostics,
+        },
       })
     end,
     ruff = function()

@@ -1,5 +1,4 @@
-local p = require("p")
-local ftplugin = p.require("ftplugin")
+local ftplugin = require("ftplugin")
 
 local function run_file(cmd)
   vim.cmd.update()
