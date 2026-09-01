@@ -50,7 +50,7 @@ EOF
 }
 
 function install_starship() {
-  curl -sS https://starship.rs/install.sh | sh
+  curl -sS https://starship.rs/install.sh | sh -s -- -y
     cat << 'EOF' >> ~/.zshrc
 
 eval "$(starship init zsh)"
