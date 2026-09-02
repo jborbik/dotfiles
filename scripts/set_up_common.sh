@@ -19,8 +19,8 @@ git config --global --bool push.autoSetupRemote true
 # always rebase on pull
 git config --global pull.rebase true
 
-git config --global user.name "Jedrzej Orbik"
-git config --global user.email Jendker@users.noreply.github.com
+git config --global --get user.name >/dev/null || git config --global user.name "Jedrzej Orbik"
+git config --global --get user.email >/dev/null || git config --global user.email jborbik@users.noreply.github.com
 
 grep -Fq 'source ~/.aliases' "$HOME/.zshrc" || echo '[ -e ~/.aliases ] && source ~/.aliases' >>"$HOME/.zshrc"
 grep -Fxq 'export PATH=$PATH:$HOME/.local/bin' "$HOME/.zshrc" || echo 'export PATH=$PATH:$HOME/.local/bin' >>"$HOME/.zshrc"

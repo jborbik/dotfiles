@@ -19,6 +19,7 @@ done
 
 function setup_nerdfont() {
   mkdir -p ~/.local/share/fonts
+  rm -rf /tmp/SF-Mono-Nerd-Font
   git clone https://github.com/epk/SF-Mono-Nerd-Font.git /tmp/SF-Mono-Nerd-Font
   cp /tmp/SF-Mono-Nerd-Font/*.otf ~/.local/share/fonts/
   rm -rf /tmp/SF-Mono-Nerd-Font
@@ -62,7 +63,7 @@ function install_flatpak() {
 
 function install_open_any_terminal() {
   # ubuntu specific
-  if [ "$distro_name" = "Ubuntu" ]; then
+  if [ "${distro_name:-}" = "Ubuntu" ]; then
     return
   fi
   # to open from nautilus with default terminal
@@ -71,6 +72,7 @@ function install_open_any_terminal() {
     cwd=$(pwd)
     cd /tmp
     sudo apt install gettext -y
+    rm -rf /tmp/nautilus-open-any-terminal
     git clone https://github.com/Stunkymonkey/nautilus-open-any-terminal.git
     cd nautilus-open-any-terminal
     make
@@ -113,24 +115,30 @@ function install_ghostty_source() {
 
 function install_ghostty_ubuntu_package() {
   if ! [ -x "$(command -v ghostty)" ]; then
-    LATEST_VERSION=$(curl -s "https://api.github.com/repos/mkasberg/ghostty-ubuntu/releases/latest" | grep -Po '"tag_name": "\K[^"]+')
-    wget -O /tmp/ghostty.deb "https://github.com/mkasberg/ghostty-ubuntu/releases/download/${LATEST_VERSION}/ghostty_${LATEST_VERSION//-ppa/.ppa}_$(dpkg --print-architecture)_$(lsb_release -rs).deb" && sudo apt -f install -y /tmp/ghostty.deb || return 1
+    local auth_header=()
+    if [ -n "${GITHUB_TOKEN:-}" ]; then
+      auth_header=(-H "Authorization: Bearer $GITHUB_TOKEN")
+    fi
+    LATEST_VERSION=$(curl -s "${auth_header[@]}" "https://api.github.com/repos/mkasberg/ghostty-ubuntu/releases/latest" | grep -Po '"tag_name": "\K[^"]+')
+    wget -O /tmp/ghostty.deb "https://github.com/mkasberg/ghostty-ubuntu/releases/download/${LATEST_VERSION}/ghostty_${LATEST_VERSION//-ppa/.ppa}_$(dpkg --print-architecture)_$(lsb_release -rs).deb" && sudo apt -f install -y /tmp/ghostty.deb && rm -f /tmp/ghostty.deb || return 1
   fi
 }
 
 function install_ghostty() {
-  if [ "$distro_name" = "Ubuntu" ]; then
+  if [ "${distro_name:-}" = "Ubuntu" ]; then
     install_ghostty_ubuntu_package || install_ghostty_source
   else
     install_ghostty_source
   fi
 }
 
-function install_trdop() {
+function install_tdrop() {
   cwd=$(pwd)
   mkdir -p ~/.local/bin/
   cd ~/.local/bin/
-  git clone https://github.com/noctuid/tdrop.git
+  if [ ! -d "tdrop" ]; then
+    git clone https://github.com/noctuid/tdrop.git
+  fi
   echo "Add custom hotkey in Ubuntu to activate terminal with tdrop"
   echo "Command is: '$HOME/.local/bin/tdrop/tdrop -mta -h 100% <terminal_name>'"
   echo "This will work work with nvidia drivers on the latest Ubuntu"
@@ -145,9 +153,9 @@ function install_wezterm() {
   sudo apt update
   sudo apt install wezterm -y
 
-  if [ "$distro_name" = "Ubuntu" ] && [[ ! -e "$HOME/.local/bin/tdrop/tdrop" ]]; then
+  if [ "${distro_name:-}" = "Ubuntu" ] && [[ ! -e "$HOME/.local/bin/tdrop/tdrop" ]]; then
     # ubuntu specific - set up tdrop for wezterm activation with hotkey
-    install_trdop
+    install_tdrop
   fi
 }
 
@@ -158,7 +166,7 @@ install_open_any_terminal
 install_starship
 sudo apt install copyq -y
 
-if [ "$distro_name" = "Ubuntu" ]; then
+if [ "${distro_name:-}" = "Ubuntu" ]; then
   # disable meta+number key bindings - it interferes with wezterm
   gsettings set org.gnome.shell.extensions.dash-to-dock hot-keys false || true
   for i in $(seq 1 9); do gsettings set org.gnome.shell.keybindings "switch-to-application-${i}" '[]' || true; done

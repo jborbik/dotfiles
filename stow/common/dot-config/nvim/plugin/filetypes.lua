@@ -36,7 +36,7 @@ ftplugin.extend_all({
           vim.cmd.write()
           vim.cmd("silent !autoimport " .. vim.api.nvim_buf_get_name(0))
           vim.cmd.edit()
-          vim.lsp.buf.formatting({})
+          vim.lsp.buf.format({})
         end, { buffer = bufnr })
       end
       vim.keymap.set(

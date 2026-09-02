@@ -66,15 +66,20 @@ function install_node() {
   installed=false
   if ! [ -x "$(command -v nvm)" ]; then
     echo "Installing nvm."
-    LATEST_NVM_VERSION=$(curl -s "https://api.github.com/repos/nvm-sh/nvm/releases/latest" | grep -Po '"tag_name": "v\K[0-9.]+')
+    local auth_header=()
+    if [ -n "${GITHUB_TOKEN:-}" ]; then
+      auth_header=(-H "Authorization: Bearer $GITHUB_TOKEN")
+    fi
+    LATEST_NVM_VERSION=$(curl -s "${auth_header[@]}" "https://api.github.com/repos/nvm-sh/nvm/releases/latest" | grep -Po '"tag_name": "v\K[0-9.]+')
     nvm_install_command="wget -qO- https://raw.githubusercontent.com/nvm-sh/nvm/v${LATEST_NVM_VERSION}/install.sh | bash"
     zsh -c "$nvm_install_command" || eval "$nvm_install_command"
     # load nvm
-    export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" || printf %s "${XDG_CONFIG_HOME}/nvm")"
+    NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" || printf %s "${XDG_CONFIG_HOME}/nvm")"
+    export NVM_DIR
     [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # This loads nvm
     # add nvm to .zshrc with string does not exists after the installation
-    if ! grep -Fxq 'export NVM_DIR="$HOME/.nvm"' $HOME/.zshrc; then
-      tee -a $HOME/.zshrc >/dev/null <<'EOT'
+    if ! grep -Fxq 'export NVM_DIR="$HOME/.nvm"' "$HOME/.zshrc"; then
+      tee -a "$HOME/.zshrc" >/dev/null <<'EOT'
 # Load nvm
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
@@ -91,7 +96,7 @@ EOT
   else
     nvm install --lts
   fi
-  if [ $installed = true ]; then
+  if [ "$installed" = true ]; then
     echo "Please source ~/.zshrc or ~/.bashrc"
   fi
 }
@@ -99,15 +104,23 @@ EOT
 function install_delta() {
   if ! [ -x "$(command -v delta)" ]; then
     echo "Installing delta."
-    LATEST_DELTA_VERSION=$(curl -s "https://api.github.com/repos/dandavison/delta/releases/latest" | grep -Po '"tag_name": "\K[0-9.]+')
-    wget -O /tmp/delta.deb "https://github.com/dandavison/delta/releases/download/${LATEST_DELTA_VERSION}/git-delta_${LATEST_DELTA_VERSION}_$(dpkg --print-architecture).deb" && sudo apt install -y /tmp/delta.deb && rm /tmp/delta.deb
+    local auth_header=()
+    if [ -n "${GITHUB_TOKEN:-}" ]; then
+      auth_header=(-H "Authorization: Bearer $GITHUB_TOKEN")
+    fi
+    LATEST_DELTA_VERSION=$(curl -s "${auth_header[@]}" "https://api.github.com/repos/dandavison/delta/releases/latest" | grep -Po '"tag_name": "\K[0-9.]+')
+    wget -O /tmp/delta.deb "https://github.com/dandavison/delta/releases/download/${LATEST_DELTA_VERSION}/git-delta_${LATEST_DELTA_VERSION}_$(dpkg --print-architecture).deb" && sudo apt install -y /tmp/delta.deb && rm -f /tmp/delta.deb
   fi
 }
 
 function install_gh() {
   if ! [ -x "$(command -v gh)" ]; then
-    LATEST_GH_VERSION=$(curl -s "https://api.github.com/repos/cli/cli/releases/latest" | grep -Po '"tag_name": "v\K[0-9.]+')
-    wget -O /tmp/gh.deb "https://github.com/cli/cli/releases/download/v${LATEST_GH_VERSION}/gh_${LATEST_GH_VERSION}_linux_$(dpkg --print-architecture).deb" && sudo dpkg -i /tmp/gh.deb && sudo apt install -y /tmp/gh.deb
+    local auth_header=()
+    if [ -n "${GITHUB_TOKEN:-}" ]; then
+      auth_header=(-H "Authorization: Bearer $GITHUB_TOKEN")
+    fi
+    LATEST_GH_VERSION=$(curl -s "${auth_header[@]}" "https://api.github.com/repos/cli/cli/releases/latest" | grep -Po '"tag_name": "v\K[0-9.]+')
+    wget -O /tmp/gh.deb "https://github.com/cli/cli/releases/download/v${LATEST_GH_VERSION}/gh_${LATEST_GH_VERSION}_linux_$(dpkg --print-architecture).deb" && sudo apt install -y /tmp/gh.deb && rm -f /tmp/gh.deb
     echo "Optionally run 'gh auth login'"
   fi
 }
@@ -115,16 +128,17 @@ function install_gh() {
 function update_git() {
   # need at least git 2.31
   version=$(git --version | tr -d -c 0-9.)
-  major=$(echo $version | cut -d. -f1)
-  minor=$(echo $version | cut -d. -f2)
-  revision=$(echo $version | cut -d. -f3)
-  revision=$(expr $revision + 1)
+  major=$(echo "$version" | cut -d. -f1)
+  minor=$(echo "$version" | cut -d. -f2)
 
-  if ((2 > $major)) || ((31 > $minor)); then
-    echo "Updating git to the latest version..."
-    sudo add-apt-repository ppa:git-core/ppa -y
-    sudo apt-get update
-    sudo apt-get install --upgrade git -y
+  if [ "$major" -lt 2 ] || { [ "$major" -eq 2 ] && [ "$minor" -lt 31 ]; }; then
+    if [ "${distro_name:-}" = "Ubuntu" ]; then
+      echo "Updating git to the latest version..."
+      sudo apt-get install -y software-properties-common
+      sudo add-apt-repository ppa:git-core/ppa -y
+      sudo apt-get update
+      sudo apt-get install --upgrade git -y
+    fi
   else
     echo "Git version $version is sufficient."
   fi
@@ -255,8 +269,10 @@ sudo apt install tmux curl wget locales lsb-release zsh xclip unzip python3-venv
 # for thefuck
 sudo apt install python3-dev python3-pip python3-setuptools -y
 # symlink fdfind as fd
-mkdir -p $HOME/.local/bin
-ln -s $(which fdfind) $HOME/.local/bin/fd || true
+mkdir -p "$HOME/.local/bin"
+if command -v fdfind >/dev/null 2>&1; then
+  ln -sf "$(command -v fdfind)" "$HOME/.local/bin/fd"
+fi
 
 sudo apt install ripgrep -y || true
 
@@ -301,14 +317,6 @@ fi
 sudo locale-gen en_US
 sudo locale-gen en_US.UTF-8
 
-# .tmux.conf
-grep -qF 'default-shell /bin/zsh' "$HOME/.tmux.conf" || cat << EOF >> "$HOME/.tmux.conf"
-set -g history-limit 125000
-set -g default-shell /bin/zsh
-set -g mouse on
-set -g status-right " \"#{=21:host}\" %H:%M %d-%b-%y"
-EOF
-
 # set up thefuck
 if ! command -v thefuck &>/dev/null; then
   pipx install thefuck
@@ -319,9 +327,10 @@ if ! [ -x "$(command -v nvim)" ]; then
   echo 'nvim is not installed. installing'
   install_nvim_binary stable
   # install plugins
-  nvim --headless "+Lazy! install" +qa
-  # repeat again until successful
-  while [ $? -ne 0 ]; do !!; done
+  until nvim --headless "+Lazy! install" +qa; do
+    echo "Retrying nvim plugin installation..."
+    sleep 1
+  done
 fi
 
 # set up fzf for zsh

@@ -116,7 +116,7 @@ fi
 # Private submodule install
 SUBMODULE_PATH="dotfiles_private"
 # Check if the submodule is not empty
-if [[ -n "$(ls -A ${SUBMODULE_PATH})" ]]; then
+if [ -d "${SUBMODULE_PATH}" ] && [ -n "$(ls -A "${SUBMODULE_PATH}" 2>/dev/null)" ]; then
   echo "Private submodule is available. Installing..."
   submodule_args=()
   if [[ $install_only == true ]]; then

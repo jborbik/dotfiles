@@ -61,23 +61,21 @@ end
 M.is_dev_dir = is_dev_dir()
 
 function M.getGitMainBranch()
-  -- get git main branch name
-  local get_main_branch_shell_command = [[command git rev-parse --git-dir &>/dev/null || return
-    local ref
-    for ref in refs/{heads,remotes/{origin,upstream}}/{main,trunk}; do
-      if command git show-ref -q --verify $ref; then
-        echo ${ref:t}
-        return
-      fi
-    done
-    echo master
-  ]]
-  local is_git_repo = string.gsub(vim.fn.system('git rev-parse --is-inside-work-tree'), "\n$", "")
-  if is_git_repo == "true" then
-    return string.gsub(vim.fn.system(get_main_branch_shell_command), "\n$", "")
-  else
+  local is_git_repo = string.gsub(vim.fn.system('git rev-parse --is-inside-work-tree 2>/dev/null'), "%s+", "")
+  if is_git_repo ~= "true" then
     return nil
   end
+  local origin_head = vim.fn.systemlist("git symbolic-ref --short refs/remotes/origin/HEAD 2>/dev/null")[1]
+  if vim.v.shell_error == 0 and origin_head and origin_head ~= "" then
+    return origin_head:match("origin/(.+)$") or origin_head
+  end
+  for _, name in ipairs({ "main", "trunk", "master" }) do
+    vim.fn.system("git show-ref --verify --quiet refs/heads/" .. name)
+    if vim.v.shell_error == 0 then
+      return name
+    end
+  end
+  return "main"
 end
 
 function M.getVisualSelection()
@@ -221,13 +219,13 @@ M.split_string = function(input, delimiter)
   return result
 end
 
-M.matching_string = function(string, table)
-  for _, v in ipairs(table) do
-    if string.find(string, v) then
+M.matching_string = function(str, tbl)
+  for _, v in ipairs(tbl) do
+    if str:find(v, 1, true) then
       return v
     end
   end
-return nil
+  return nil
 end
 
 M.theme_extensions = {"onedark", "kanagawa"}

@@ -3,7 +3,7 @@ set -e
 
 # Close any open System Preferences panes, to prevent them from overriding
 # settings we’re about to change
-osascript -e 'tell application "System Preferences" to quit'
+osascript -e 'tell application "System Settings" to quit' 2>/dev/null || osascript -e 'tell application "System Preferences" to quit' 2>/dev/null || true
 
 # Disable press-and-hold for keys in favor of key repeat.
 defaults write -g ApplePressAndHoldEnabled -bool false
@@ -71,19 +71,5 @@ defaults write com.apple.Safari AutoOpenSafeDownloads -bool false
 # Automatically quit printer app once the print jobs complete
 defaults write com.apple.print.PrintingPrefs "Quit When Finished" -bool true
 
-# some stuff from https://github.com/mathiasbynens/dotfiles/blob/master/.macos
-###############################################################################
-# Finder                                                                      #
-###############################################################################
-# Avoid creating .DS_Store files on network or USB volumes
-defaults write com.apple.desktopservices DSDontWriteNetworkStores -bool true
-defaults write com.apple.desktopservices DSDontWriteUSBStores -bool true
-
-###############################################################################
-# Safari
-###############################################################################
-# from https://gist.github.com/alanzeino/42b6d983c7aa2f29d64ea2749621f7cf
 # Show status bar in Safari
 defaults write com.apple.Safari ShowOverlayStatusBar -bool true
-# Don't open files in Safari after downloading
-defaults write com.apple.Safari AutoOpenSafeDownloads -bool false

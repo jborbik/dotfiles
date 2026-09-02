@@ -52,11 +52,11 @@ local lsp_attach = function(client, bufnr)
   end
 
   nmap('gd', "<cmd>Glance definitions<cr>", '[G]oto [d]efinition')
-  nmap('gD', vim.lsp.buf.declaration, '[G]oto [D]ecalaration')
+  nmap('gD', vim.lsp.buf.declaration, '[G]oto [D]eclaration')
   nmap('gi', "<cmd>Glance implementations<cr>", '[G]oto [I]mplementation')
   nmap('gH', "<cmd>Glance references<cr>", 'Goto references')
-  nmap('go', "<cmd>Glance type_definitions<cr>", 'Goto type lsp_definitions')
-  nmap('<leader>gR', "<cmd>Glance resume<cr>", 'Goto type lsp_definitions')
+  nmap('go', "<cmd>Glance type_definitions<cr>", 'Goto type definitions')
+  nmap('<leader>gR', "<cmd>Glance resume<cr>", 'Glance resume')
   nmap('gh', vim.lsp.buf.hover, '[G][H]over documentation')
   nmap('gl', vim.diagnostic.open_float, 'Open diagnostics under cursor')
 
@@ -64,7 +64,6 @@ local lsp_attach = function(client, bufnr)
   nmap('<leader>ca', vim.lsp.buf.code_action, '[C]ode [A]ction')
 
   -- Lesser used LSP functionality
-  nmap('gD', vim.lsp.buf.declaration, '[G]oto [D]eclaration')
   nmap('<leader>wa', vim.lsp.buf.add_workspace_folder, '[W]orkspace [A]dd Folder')
   nmap('<leader>wr', vim.lsp.buf.remove_workspace_folder, '[W]orkspace [R]emove Folder')
   nmap('<leader>wl', function()
@@ -73,11 +72,6 @@ local lsp_attach = function(client, bufnr)
 
   nmap('[e', '<cmd>lua vim.diagnostic.goto_prev({ severity = vim.diagnostic.severity.ERROR })<CR>')
   nmap(']e', '<cmd>lua vim.diagnostic.goto_next({ severity = vim.diagnostic.severity.ERROR })<CR>')
-
-  -- Disable treesitter highlighting in favor of LSP semantic tokens if supported
-  if client.server_capabilities.semanticTokensProvider then
-    vim.treesitter.stop(bufnr)
-  end
 end
 
 lsp_zero.extend_lspconfig({
